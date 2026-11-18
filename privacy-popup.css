@@ -1,0 +1,156 @@
+
+/* Privacy Choices Popup Component */
+
+#privacyChoicesPopup {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Initially hidden */
+.pc-modal-wrapper {
+    display: none;
+}
+
+/* Overlay */
+.pc-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 99998;
+}
+
+/* Popup container */
+.pc-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: calc(100% - 4px);
+    max-width: 1300px;
+    max-height: 95vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    background: #fff;
+    border: 2px solid #444;
+    border-radius: 13px;
+
+    padding: 85px 7.3% 95px;
+
+    z-index: 99999;
+    color: #222;
+}
+
+/* Header */
+.pc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 95px;
+}
+
+.pc-header h2 {
+    font-size: 38px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+.pc-close {
+    border: none;
+    background: transparent;
+    font-size: 38px;
+    font-weight: 200;
+    cursor: pointer;
+    color: #222;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Description */
+.pc-description {
+    font-size: 30px;
+    line-height: 1.6;
+    font-weight: 400;
+    color: #777;
+    letter-spacing: 0.2px;
+    margin-bottom: 32px;
+}
+
+/* Buttons */
+.pc-button {
+    display: block;
+    width: 100%;
+    min-height: 96px;
+
+    border-radius: 60px;
+    font-size: 29px;
+    font-weight: 400;
+
+    cursor: pointer;
+    padding: 15px 25px;
+    margin-top: 32px;
+
+    transition: background 0.2s ease;
+}
+
+.pc-primary {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+}
+
+.pc-primary:hover {
+    background: #333;
+}
+
+.pc-secondary {
+    background: #fff;
+    color: #222;
+    border: 2px solid #000;
+}
+
+.pc-secondary:hover {
+    background: #f1f1f1;
+}
+
+/* Status */
+.pc-status {
+    display: none;
+    font-size: 16px;
+    color: #333;
+    margin-top: 25px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .pc-modal {
+        width: calc(100% - 24px);
+        max-height: 90vh;
+        padding: 35px 25px;
+    }
+
+    .pc-header {
+        margin-bottom: 35px;
+    }
+
+    .pc-header h2 {
+        font-size: 25px;
+    }
+
+    .pc-close {
+        font-size: 30px;
+    }
+
+    .pc-description {
+        font-size: 17px;
+        line-height: 1.6;
+    }
+
+    .pc-button {
+        min-height: 65px;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+}
