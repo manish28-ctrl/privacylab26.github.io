@@ -1,7 +1,7 @@
 
 (function () {
 
-    const COMPONENT_PATH = "/privacy-choices/";
+    const COMPONENT_PATH = "./";
 
     let popupLoaded = false;
     let loadingPromise = null;
