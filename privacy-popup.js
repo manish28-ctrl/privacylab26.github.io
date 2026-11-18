@@ -1,7 +1,7 @@
 
 (function () {
 
-    const COMPONENT_PATH = "./";
+    const COMPONENT_PATH = "/privacylab26.github.io/";
 
     let popupLoaded = false;
     let loadingPromise = null;
