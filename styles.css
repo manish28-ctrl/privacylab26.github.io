@@ -36,3 +36,68 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+
+
+
+/* ==========================================
+   TITAN - PRIVACY LAB WEBFORM SECTION
+========================================== */
+
+#privacy-preferences {
+    max-width: 850px;
+    width: calc(100% - 40px);
+    margin: 50px auto;
+    padding: 35px;
+    box-sizing: border-box;
+    background: #F3F7FA;
+    border: 1px solid #DCE5ED;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+#privacy-preferences h2 {
+    color: #1B2A5E;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+#privacy-preferences p {
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+#ot-container1 {
+    width: 100%;
+    margin-top: 25px;
+}
+
+/* Footer link */
+
+#open-privacy-form {
+    display: inline-block;
+    color: #1B2A5E;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 14px;
+}
+
+#open-privacy-form:hover {
+    color: #102A5C;
+    text-decoration: underline;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+    #privacy-preferences {
+        width: calc(100% - 24px);
+        padding: 20px;
+        margin: 25px auto;
+    }
+
+    #privacy-preferences h2 {
+        font-size: 22px;
+    }
+}
+
