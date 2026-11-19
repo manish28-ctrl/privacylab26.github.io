@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<script
-  src="https://privacyportal-in.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js"
-  data-id="53ec83ca-0693-46f3-a55b-110c3f8f5a64-test"
-  worker="https://consent-api.onetrust.com"
-></script>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +25,12 @@
       })();
     </script>
 
+  <!-- OneTrust Embedded Web Form -->
+<script
+  src="https://privacyportal-in.onetrust.com/consent-embedded-forms/consent-receipt-scripts/OtFormStub.js"
+  data-id="53ec83ca-0693-46f3-a55b-110c3f8f5a64-test"
+  worker="https://consent-api.onetrust.com"
+></script>
 
  </head>
 <body>
@@ -38,17 +38,7 @@
     <nav>
 
 
-<section id="privacy-preferences">
-  <h2>Manage Your Privacy Preferences</h2>
 
-  <p>
-    Please use the form below to submit your privacy preferences.
-  </p>
-
-  <!-- OneTrust form renders here -->
-  <div id="ot-container1"></div>
-
-</section>
 
       
         <ul>
@@ -103,6 +93,18 @@
     <!-- OneTrust Cookies List start -->
 <div id="ot-sdk-cookie-policy"></div>
 <!-- OneTrust Cookies List end -->
+<!-- OneTrust Embedded Web Form -->
+<section id="privacy-preferences">
+    <h2>Manage Your Privacy Preferences</h2>
+
+    <p>
+      Exercise your privacy rights using the form below.
+    </p>
+
+    <div id="ot-container1"></div>
+</section>
+
+      
     <footer>
         <div>
             <p>&copy; 2024 Privacy Lab29</p>
@@ -143,7 +145,7 @@
     document.getElementById("open-privacy-form");
 
   const formContainer =
-    document.getElementById("YOUR_ONETRUST_CONTAINER_ID");
+    document.getElementById("ot-container1");
 
   let formInstalled = false;
   let installationInProgress = false;
