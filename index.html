@@ -36,6 +36,21 @@
 <body>
      <!-- Dashboard Navigation -->
     <nav>
+
+
+<section id="privacy-preferences">
+  <h2>Manage Your Privacy Preferences</h2>
+
+  <p>
+    Please use the form below to submit your privacy preferences.
+  </p>
+
+  <!-- OneTrust form renders here -->
+  <div id="ot-container1"></div>
+
+</section>
+
+      
         <ul>
             <!-- Link to redirect to Users page -->
             <li><button><a href="test2.html" id="Nav1">Users</a></button></li>
@@ -96,6 +111,9 @@
             <a href="https://privacyportal-in.onetrust.com/webform/53ec83ca-0693-46f3-a55b-110c3f8f5a64/2d21cd3b-7e9c-4439-87ed-44ffa09e5803">
   Excersice Your Rights(COPY)
 </a>
+          <a href="#privacy-preferences" id="open-privacy-form">
+  Privacy Preferences
+</a>
          </div>
          <div>
 
@@ -113,6 +131,86 @@
 <script src="scriptcokies.js"></script>
           </div>
     <script src="/privacylab26.github.io/privacy-popup.js" defer></script>
+
+
+<script>
+(function () {
+
+  const collectionPointId =
+    "53ec83ca-0693-46f3-a55b-110c3f8f5a64-test";
+
+  const footerLink =
+    document.getElementById("open-privacy-form");
+
+  const formContainer =
+    document.getElementById("YOUR_ONETRUST_CONTAINER_ID");
+
+  let formInstalled = false;
+  let installationInProgress = false;
+
+  if (!footerLink || !formContainer) {
+    console.error("OneTrust: Footer link or form container missing.");
+    return;
+  }
+
+  footerLink.addEventListener("click", function (event) {
+
+    event.preventDefault();
+
+    // Scroll to the inline form
+    formContainer.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    if (formInstalled || installationInProgress) {
+      return;
+    }
+
+    if (
+      window.OneTrust &&
+      window.OneTrust.webform &&
+      typeof window.OneTrust.webform.InstallCP === "function"
+    ) {
+
+      installationInProgress = true;
+
+      window.OneTrust.webform.InstallCP(
+        collectionPointId,
+        function (status) {
+
+          console.log("OneTrust InstallCP status:", status);
+
+          installationInProgress = false;
+
+          if (status === true) {
+            formInstalled = true;
+            console.log("OneTrust form installed successfully.");
+          } else {
+            console.error("OneTrust form installation failed.");
+          }
+
+        }
+      );
+
+    } else {
+
+      console.error(
+        "OneTrust SDK is not ready. Check OtFormStub.js loading."
+      );
+
+    }
+
+  });
+
+  window.addEventListener("OnetrustFormLoaded", function (event) {
+    console.log("OneTrust form loaded:", event.detail);
+  });
+
+})();
+</script>
+
+  
 </body>
 </html>
 
