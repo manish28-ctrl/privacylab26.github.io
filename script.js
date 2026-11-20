@@ -311,7 +311,11 @@ function openPrivacyNotice() {
 
       OneTrust.NoticeApi.Initialized.then(function () {
 
-        OneTrust.NoticeApi.LoadNotices([${JSON.stringify(noticeURL)}]);
+  OneTrust.NoticeApi.LoadNotices(
+    [${JSON.stringify(noticeURL)}],
+    true,
+    "en"
+  );
 
         filterOneTrustDropdown();
 
