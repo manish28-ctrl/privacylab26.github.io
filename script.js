@@ -29,67 +29,55 @@ function openPrivacyNotice() {
     return;
   }
 
+
   // ==========================================
   // 1. COUNTRY CONFIGURATION
   // ==========================================
 
-  // TESTING ONLY:
-  // Change IN to AE, QA, VN, MY or US to test.
-  // Replace this with your backend-provided country
-  // code when implementing automatic GeoIP detection.
+  // TEMPORARY TESTING
+  // Change IN to AE, QA, VN, MY or US.
 
   const countryCode = "IN";
 
   const COUNTRY_LANGUAGES = {
 
     AE: [
-      "UAE Arabic",
-      "Arabic (United Arab Emirates)",
-      "English",
-      "en",
+      "en-us",
       "ar-ae"
     ],
 
     QA: [
-      "Qatar Arabic",
-      "Arabic (Qatar)",
-      "English",
-      "en",
+      "en-us",
       "ar-qa"
     ],
 
     IN: [
-      "Gujarati", "gu",
-      "Marathi", "mr",
-      "Telugu", "te",
-      "Tamil", "ta",
-      "Bengali", "bn",
-      "Kannada", "kn",
-      "Malayalam", "ml",
-      "Assamese", "as",
-      "Punjabi", "pa",
-      "Oriya", "Odia", "or", "od",
-      "Hindi", "hi",
-      "English", "en"
+      "en-us",
+      "gu",
+      "mr",
+      "te",
+      "ta",
+      "bn",
+      "kn",
+      "ml",
+      "in-as",
+      "pa",
+      "in-or",
+      "hi"
     ],
 
     VN: [
-      "Vietnamese",
-      "vi",
-      "English",
-      "en"
+      "en-us",
+      "vi"
     ],
 
     MY: [
-      "Malay",
-      "ms",
-      "English",
-      "en"
+      "en-us",
+      "ms-my"
     ],
 
     US: [
-      "English",
-      "en"
+      "en-us"
     ]
 
   };
@@ -137,8 +125,7 @@ function openPrivacyNotice() {
       margin-top: 0;
     }
 
-    /* Keep the native OneTrust dropdown.
-       Do not create another custom selector. */
+    /* Keep the native OneTrust dropdown */
 
     .ot-privacy-notice-language-dropdown-container {
       display: block !important;
@@ -184,125 +171,147 @@ function openPrivacyNotice() {
 
   (function () {
 
-    const allowed = ${JSON.stringify(allowedLanguages)}.map(
-      value => String(value).trim().toLowerCase()
+    // ==========================================
+    // 4. LANGUAGE FILTER CONFIGURATION
+    // ==========================================
+
+    const allowed = new Set(
+      ${JSON.stringify(allowedLanguages)}
     );
 
     const container = document.querySelector(
       ".ot-privacy-notice-language-dropdown-container"
     );
 
-    let filtering = false;
+    // English is selected only once during initialization.
+    let defaultLanguageSet = false;
 
-    function normalize(value) {
-      return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\\s+/g, " ");
-    }
+    let languageObserver = null;
+
+
+    // ==========================================
+    // 5. FILTER NATIVE ONETRUST DROPDOWN
+    // ==========================================
 
     function filterOneTrustDropdown() {
 
-      if (filtering) return;
+      if (!container) return;
 
-      const dropdowns = container.querySelectorAll("select");
+      const languageOptions = container.querySelectorAll(
+        ".ot-digital-policy-language-option"
+      );
 
-      if (!dropdowns.length) return;
+      if (!languageOptions.length) return;
 
-      filtering = true;
 
-      dropdowns.forEach(function (dropdown) {
+      // Show only the languages allowed for this country.
 
-        const options = Array.from(dropdown.options);
+      languageOptions.forEach(function (option) {
 
-        const matchedOptions = options.filter(function (option) {
+        const languageCode = (
+          option.getAttribute("data-option-value") || ""
+        ).trim().toLowerCase();
 
-          const value = normalize(option.value);
-          const label = normalize(option.textContent);
+        const isAllowed = allowed.has(languageCode);
 
-          return allowed.includes(value) ||
-                 allowed.includes(label);
+        option.style.display = isAllowed ? "" : "none";
 
-        });
-
-        // Never empty the native dropdown if the
-        // actual OneTrust option identifiers differ.
-        if (matchedOptions.length === 0) {
-
-          console.warn(
-            "No matching OneTrust languages found.",
-            options.map(option => ({
-              text: option.textContent,
-              value: option.value
-            }))
-          );
-
-          return;
-
-        }
-
-        options.forEach(function (option) {
-
-          const value = normalize(option.value);
-          const label = normalize(option.textContent);
-
-          const isAllowed =
-            allowed.includes(value) ||
-            allowed.includes(label);
-
-          option.hidden = !isAllowed;
-          option.disabled = !isAllowed;
-
-        });
-
-        // If the currently selected option is not allowed,
-        // select the first available allowed language.
-        const currentValue = normalize(dropdown.value);
-
-        const currentAllowed = matchedOptions.some(function (option) {
-          return normalize(option.value) === currentValue;
-        });
-
-        if (!currentAllowed) {
-
-          dropdown.value = matchedOptions[0].value;
-
-          dropdown.dispatchEvent(
-            new Event("change", { bubbles: true })
-          );
-
-        }
-
-        console.log(
-          "OneTrust language options filtered for:",
-          countryCode,
-          matchedOptions.map(option => option.textContent)
+        option.setAttribute(
+          "aria-hidden",
+          String(!isAllowed)
         );
+
+        option.tabIndex = isAllowed ? 0 : -1;
 
       });
 
-      filtering = false;
+
+      // ==========================================
+      // 6. ENGLISH DEFAULT - ONLY ONCE
+      // ==========================================
+
+      if (!defaultLanguageSet) {
+
+        const englishOption = Array.from(languageOptions).find(
+          function (option) {
+
+            return (
+              option.getAttribute("data-option-value") === "en-us"
+            );
+
+          }
+        );
+
+        if (englishOption && allowed.has("en-us")) {
+
+          const selectedLanguage = container.querySelector(
+            ".ot-digital-policy-language-selected"
+          );
+
+          // Mark the default as handled before clicking.
+          defaultLanguageSet = true;
+
+          if (
+            selectedLanguage &&
+            !selectedLanguage.textContent.toLowerCase().includes("english")
+          ) {
+
+            englishOption.click();
+
+            console.log(
+              "English selected as default for:",
+              countryCode
+            );
+
+          }
+
+        }
+
+      }
+
+
+      // Diagnostic output
+
+      console.log(
+        "OneTrust languages filtered for:",
+        countryCode,
+        Array.from(languageOptions)
+          .filter(function (option) {
+            return allowed.has(
+              option.getAttribute("data-option-value")
+            );
+          })
+          .map(function (option) {
+            return option.getAttribute("aria-label");
+          })
+      );
 
     }
 
 
-    // Watch OneTrust's native dropdown container.
-    // OneTrust may render its dropdown asynchronously.
+    // ==========================================
+    // 7. OBSERVE ONETRUST DYNAMIC RENDERING
+    // ==========================================
 
-    const observer = new MutationObserver(function () {
+    if (container) {
 
-      filtering = false;
-      filterOneTrustDropdown();
+      languageObserver = new MutationObserver(function () {
 
-    });
+        filterOneTrustDropdown();
 
-    observer.observe(container, {
-      childList: true,
-      subtree: true
-    });
+      });
+
+      languageObserver.observe(container, {
+        childList: true,
+        subtree: true
+      });
+
+    }
 
 
-    // Initial attempt after OneTrust initialization.
+    // ==========================================
+    // 8. LOAD ONETRUST PRIVACY NOTICE
+    // ==========================================
 
     if (
       typeof OneTrust !== "undefined" &&
@@ -311,17 +320,21 @@ function openPrivacyNotice() {
 
       OneTrust.NoticeApi.Initialized.then(function () {
 
-  OneTrust.NoticeApi.LoadNotices(
-    [${JSON.stringify(noticeURL)}],
-    true,
-    "en"
-  );
+        OneTrust.NoticeApi.LoadNotices(
+          [${JSON.stringify(noticeURL)}],
+          true,
+          "en-us"
+        );
 
+        // Apply filtering after OneTrust starts loading.
         filterOneTrustDropdown();
 
       }).catch(function (error) {
 
-        console.error("OneTrust initialization error:", error);
+        console.error(
+          "OneTrust initialization error:",
+          error
+        );
 
       });
 
@@ -337,6 +350,11 @@ function openPrivacyNotice() {
 
 </body>
 </html>`;
+
+
+  // ==========================================
+  // 9. WRITE POPUP CONTENT
+  // ==========================================
 
   privacyWindow.document.open();
   privacyWindow.document.write(popupHTML);
