@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-function openPrivacyNotice() {
+async function openPrivacyNotice() {
 
   const privacyWindow = window.open(
     "",
@@ -37,7 +37,43 @@ function openPrivacyNotice() {
   // TEMPORARY TESTING
   // Change IN to AE, QA, VN, MY or US.
 
-  const countryCode = "QA";
+  // ==========================================
+// AUTOMATIC IP COUNTRY DETECTION
+// ==========================================
+
+async function getVisitorCountry() {
+
+  try {
+
+    const response = await fetch("https://ipwho.is/");
+
+    if (!response.ok) {
+      throw new Error("IP lookup failed");
+    }
+
+    const data = await response.json();
+
+    if (data.success && data.country_code) {
+
+      console.log("Visitor country detected:", data.country_code);
+
+      return data.country_code.toUpperCase();
+
+    }
+
+    throw new Error("Country code unavailable");
+
+  } catch (error) {
+
+    console.error("Country detection failed:", error);
+
+    return "US"; // English-only fallback
+
+  }
+
+}
+
+const countryCode = await getVisitorCountry();
 
   const COUNTRY_LANGUAGES = {
 
