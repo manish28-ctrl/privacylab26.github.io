@@ -37,7 +37,7 @@ function openPrivacyNotice() {
   // TEMPORARY TESTING
   // Change IN to AE, QA, VN, MY or US.
 
-  const countryCode = "IN";
+  const countryCode = "QA";
 
   const COUNTRY_LANGUAGES = {
 
