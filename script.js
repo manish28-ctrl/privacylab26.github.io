@@ -16,8 +16,72 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// ==========================================
+// 1. AUTOMATIC IP COUNTRY DETECTION
+// ==========================================
+
+async function getVisitorCountry() {
+
+  const controller = new AbortController();
+
+  const timeout = setTimeout(function () {
+    controller.abort();
+  }, 8000);
+
+  try {
+
+    const response = await fetch("https://ipwho.is/", {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error("IP lookup HTTP error: " + response.status);
+    }
+
+    const data = await response.json();
+
+    console.log("IP API RESPONSE:", data);
+    console.log("DETECTED IP:", data.ip);
+    console.log("DETECTED COUNTRY:", data.country);
+    console.log("DETECTED COUNTRY CODE:", data.country_code);
+
+    if (data.success && data.country_code) {
+
+      const detectedCountry = data.country_code.toUpperCase();
+
+      console.log("Visitor country detected:", detectedCountry);
+
+      return detectedCountry;
+
+    }
+
+    throw new Error("Country code unavailable from IP API");
+
+  } catch (error) {
+
+    console.error("Country detection failed:", error);
+
+    // English-only fallback if IP detection fails
+    return "US";
+
+  } finally {
+
+    clearTimeout(timeout);
+
+  }
+
+}
+
+
+// ==========================================
+// 2. OPEN PRIVACY NOTICE POPUP
+// ==========================================
+
 async function openPrivacyNotice() {
 
+  // Open synchronously to avoid popup blockers
   const privacyWindow = window.open(
     "",
     "PrivacyNotice",
@@ -29,51 +93,26 @@ async function openPrivacyNotice() {
     return;
   }
 
+  // Display loading message while detecting country
+  privacyWindow.document.open();
+  privacyWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Privacy Notice</title>
+      </head>
+      <body style="font-family:Arial;padding:30px;">
+        <h2>Loading Privacy Notice...</h2>
+        <p>Detecting your location and available languages.</p>
+      </body>
+    </html>
+  `);
+  privacyWindow.document.close();
+
 
   // ==========================================
-  // 1. COUNTRY CONFIGURATION
+  // 3. COUNTRY CONFIGURATION
   // ==========================================
-
-  // TEMPORARY TESTING
-  // Change IN to AE, QA, VN, MY or US.
-
-  // ==========================================
-// AUTOMATIC IP COUNTRY DETECTION
-// ==========================================
-
-async function getVisitorCountry() {
-
-  try {
-
-    const response = await fetch("https://ipwho.is/");
-
-    if (!response.ok) {
-      throw new Error("IP lookup failed");
-    }
-
-    const data = await response.json();
-
-    if (data.success && data.country_code) {
-
-      console.log("Visitor country detected:", data.country_code);
-
-      return data.country_code.toUpperCase();
-
-    }
-
-    throw new Error("Country code unavailable");
-
-  } catch (error) {
-
-    console.error("Country detection failed:", error);
-
-    return "US"; // English-only fallback
-
-  }
-
-}
-
-const countryCode = await getVisitorCountry();
 
   const COUNTRY_LANGUAGES = {
 
@@ -119,20 +158,33 @@ const countryCode = await getVisitorCountry();
   };
 
 
+  // Detect visitor country
+  const countryCode = await getVisitorCountry();
+
+  console.log("FINAL COUNTRY CODE:", countryCode);
+
+
+  // Select languages for detected country
+  const allowedLanguages =
+    COUNTRY_LANGUAGES[countryCode] ||
+    COUNTRY_LANGUAGES.US;
+
+  console.log("ALLOWED LANGUAGES:", allowedLanguages);
+
+
   // ==========================================
-  // 2. ONETRUST NOTICE DETAILS
+  // 4. ONETRUST NOTICE DETAILS
   // ==========================================
 
   const noticeURL =
     "https://privacyportal-in-cdn.onetrust.com/storage-container/53ec83ca-0693-46f3-a55b-110c3f8f5a64/privacy-notices/bd09463e-b148-44d4-91e5-3ee9328b729a/draft/privacynotice.json";
 
-  const allowedLanguages =
-    COUNTRY_LANGUAGES[countryCode] ||
-    COUNTRY_LANGUAGES.US;
+  const settingsValue =
+    "eyJjb250ZW50QXBpVXJsIjoiaHR0cHM6Ly9wcml2YWN5cG9ydGFsLWluLm9uZXRydXN0LmNvbS9yZXF1ZXN0L3YxL2VudGVycHJpc2Vwb2xpY3kvZGlnaXRhbHBvbGljeS9jb250ZW50IiwibWV0YWRhdGFBcGlVcmwiOiJodHRwczovL3ByaXZhY3lwb3J0YWwtaW4ub25ldHJ1c3QuY29tL3JlcXVlc3QvdjEvZW50ZXJwcmlzZXBvbGljeS9kaWdpdGFscG9saWN5L21ldGEtZGF0YSJ9";
 
 
   // ==========================================
-  // 3. CREATE POPUP
+  // 5. CREATE PRIVACY NOTICE POPUP HTML
   // ==========================================
 
   const popupHTML = `<!DOCTYPE html>
@@ -160,8 +212,6 @@ const countryCode = await getVisitorCountry();
     h2 {
       margin-top: 0;
     }
-
-    /* Keep the native OneTrust dropdown */
 
     .ot-privacy-notice-language-dropdown-container {
       display: block !important;
@@ -197,36 +247,40 @@ const countryCode = await getVisitorCountry();
     src="https://privacyportal-in-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js"
     type="text/javascript"
     charset="UTF-8"
-    id="otprivacy-notice-script">
-
-    settings="eyJjb250ZW50QXBpVXJsIjoiaHR0cHM6Ly9wcml2YWN5cG9ydGFsLWluLm9uZXRydXN0LmNvbS9yZXF1ZXN0L3YxL2VudGVycHJpc2Vwb2xpY3kvZGlnaXRhbHBvbGljeS9jb250ZW50IiwibWV0YWRhdGFBcGlVcmwiOiJodHRwczovL3ByaXZhY3lwb3J0YWwtaW4ub25ldHJ1c3QuY29tL3JlcXVlc3QvdjEvZW50ZXJwcmlzZXBvbGljeS9kaWdpdGFscG9saWN5L21ldGEtZGF0YSJ9"
-
-  </script>
+    id="otprivacy-notice-script"
+    settings="${settingsValue}">
+  <\/script>
 
   <script>
 
   (function () {
 
     // ==========================================
-    // 4. LANGUAGE FILTER CONFIGURATION
+    // 6. COUNTRY AND LANGUAGE CONFIGURATION
     // ==========================================
+
+    // Pass detected country into the popup window
+    const visitorCountry = ${JSON.stringify(countryCode)};
 
     const allowed = new Set(
       ${JSON.stringify(allowedLanguages)}
     );
 
+    const noticeURL = ${JSON.stringify(noticeURL)};
+
+    console.log("Popup country:", visitorCountry);
+    console.log("Popup allowed languages:", Array.from(allowed));
+
+
     const container = document.querySelector(
       ".ot-privacy-notice-language-dropdown-container"
     );
 
-    // English is selected only once during initialization.
     let defaultLanguageSet = false;
-
-    let languageObserver = null;
 
 
     // ==========================================
-    // 5. FILTER NATIVE ONETRUST DROPDOWN
+    // 7. FILTER NATIVE ONETRUST DROPDOWN
     // ==========================================
 
     function filterOneTrustDropdown() {
@@ -240,7 +294,7 @@ const countryCode = await getVisitorCountry();
       if (!languageOptions.length) return;
 
 
-      // Show only the languages allowed for this country.
+      // Show only languages permitted for this country
 
       languageOptions.forEach(function (option) {
 
@@ -263,18 +317,16 @@ const countryCode = await getVisitorCountry();
 
 
       // ==========================================
-      // 6. ENGLISH DEFAULT - ONLY ONCE
+      // 8. ENGLISH DEFAULT - ONLY ONCE
       // ==========================================
 
       if (!defaultLanguageSet) {
 
         const englishOption = Array.from(languageOptions).find(
           function (option) {
-
             return (
               option.getAttribute("data-option-value") === "en-us"
             );
-
           }
         );
 
@@ -284,20 +336,24 @@ const countryCode = await getVisitorCountry();
             ".ot-digital-policy-language-selected"
           );
 
-          // Mark the default as handled before clicking.
-          defaultLanguageSet = true;
+          if (selectedLanguage) {
 
-          if (
-            selectedLanguage &&
-            !selectedLanguage.textContent.toLowerCase().includes("english")
-          ) {
+            defaultLanguageSet = true;
 
-            englishOption.click();
+            if (
+              !selectedLanguage.textContent
+                .toLowerCase()
+                .includes("english")
+            ) {
 
-            console.log(
-              "English selected as default for:",
-              countryCode
-            );
+              englishOption.click();
+
+              console.log(
+                "English selected as default for:",
+                visitorCountry
+              );
+
+            }
 
           }
 
@@ -306,11 +362,13 @@ const countryCode = await getVisitorCountry();
       }
 
 
-      // Diagnostic output
+      // ==========================================
+      // 9. DIAGNOSTIC OUTPUT
+      // ==========================================
 
       console.log(
         "OneTrust languages filtered for:",
-        countryCode,
+        visitorCountry,
         Array.from(languageOptions)
           .filter(function (option) {
             return allowed.has(
@@ -326,12 +384,12 @@ const countryCode = await getVisitorCountry();
 
 
     // ==========================================
-    // 7. OBSERVE ONETRUST DYNAMIC RENDERING
+    // 10. OBSERVE ONETRUST DYNAMIC RENDERING
     // ==========================================
 
     if (container) {
 
-      languageObserver = new MutationObserver(function () {
+      const languageObserver = new MutationObserver(function () {
 
         filterOneTrustDropdown();
 
@@ -346,7 +404,7 @@ const countryCode = await getVisitorCountry();
 
 
     // ==========================================
-    // 8. LOAD ONETRUST PRIVACY NOTICE
+    // 11. LOAD ONETRUST PRIVACY NOTICE
     // ==========================================
 
     if (
@@ -357,12 +415,11 @@ const countryCode = await getVisitorCountry();
       OneTrust.NoticeApi.Initialized.then(function () {
 
         OneTrust.NoticeApi.LoadNotices(
-          [${JSON.stringify(noticeURL)}],
+          [noticeURL],
           true,
           "en-us"
         );
 
-        // Apply filtering after OneTrust starts loading.
         filterOneTrustDropdown();
 
       }).catch(function (error) {
@@ -382,15 +439,19 @@ const countryCode = await getVisitorCountry();
 
   })();
 
-  </script>
+  <\/script>
 
 </body>
 </html>`;
 
 
   // ==========================================
-  // 9. WRITE POPUP CONTENT
+  // 12. WRITE POPUP CONTENT
   // ==========================================
+
+  if (privacyWindow.closed) {
+    return;
+  }
 
   privacyWindow.document.open();
   privacyWindow.document.write(popupHTML);
