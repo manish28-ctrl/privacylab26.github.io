@@ -51,7 +51,7 @@ function openPrivacyNotice() {
   Do not leave this placeholder unchanged in production.
 -->
 <script>
-  window.NOTICE_COUNTRY_CODE = "__COUNTRY_CODE__";
+  window.NOTICE_COUNTRY_CODE = "IN";
 </script>
 
 <!-- OneTrust Privacy Notice SDK -->
