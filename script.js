@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const privacyLink = document.getElementById("privacy-notice-link");
 
   if (!privacyLink) {
-    console.error("Privacy Notice footer link not found.");
+    console.error("Privacy Notice link not found.");
     return;
   }
 
@@ -30,84 +30,101 @@ function openPrivacyNotice() {
   }
 
   // ==========================================
-  // COUNTRY CONFIGURATION
+  // 1. COUNTRY CONFIGURATION
   // ==========================================
 
-  // TESTING ONLY: Change this to AE, QA, VN, MY or US
-  // to test the corresponding language dropdown.
+  // TESTING ONLY:
+  // Change IN to AE, QA, VN, MY or US to test.
+  // Replace this with your backend-provided country
+  // code when implementing automatic GeoIP detection.
+
   const countryCode = "IN";
 
   const COUNTRY_LANGUAGES = {
 
     AE: [
-      { code: "ar-ae", label: "UAE Arabic" },
-      { code: "en", label: "English" }
+      "UAE Arabic",
+      "Arabic (United Arab Emirates)",
+      "English",
+      "en",
+      "ar-ae"
     ],
 
     QA: [
-      { code: "ar-qa", label: "Qatar Arabic" },
-      { code: "en", label: "English" }
+      "Qatar Arabic",
+      "Arabic (Qatar)",
+      "English",
+      "en",
+      "ar-qa"
     ],
 
     IN: [
-      { code: "gu", label: "Gujarati" },
-      { code: "mr", label: "Marathi" },
-      { code: "te", label: "Telugu" },
-      { code: "ta", label: "Tamil" },
-      { code: "bn", label: "Bengali" },
-      { code: "kn", label: "Kannada" },
-      { code: "ml", label: "Malayalam" },
-      { code: "as", label: "Assamese" },
-      { code: "pa", label: "Punjabi" },
-      { code: "or", label: "Oriya" },
-      { code: "hi", label: "Hindi" },
-      { code: "en", label: "English" }
+      "Gujarati", "gu",
+      "Marathi", "mr",
+      "Telugu", "te",
+      "Tamil", "ta",
+      "Bengali", "bn",
+      "Kannada", "kn",
+      "Malayalam", "ml",
+      "Assamese", "as",
+      "Punjabi", "pa",
+      "Oriya", "Odia", "or", "od",
+      "Hindi", "hi",
+      "English", "en"
     ],
 
     VN: [
-      { code: "vi", label: "Vietnamese" },
-      { code: "en", label: "English" }
+      "Vietnamese",
+      "vi",
+      "English",
+      "en"
     ],
 
     MY: [
-      { code: "ms", label: "Malay" },
-      { code: "en", label: "English" }
+      "Malay",
+      "ms",
+      "English",
+      "en"
     ],
 
     US: [
-      { code: "en", label: "English" }
+      "English",
+      "en"
     ]
 
   };
 
-  const languages =
-    COUNTRY_LANGUAGES[countryCode] ||
-    [{ code: "en", label: "English" }];
 
   // ==========================================
-  // ONETRUST NOTICE URL
+  // 2. ONETRUST NOTICE DETAILS
   // ==========================================
 
   const noticeURL =
     "https://privacyportal-in-cdn.onetrust.com/storage-container/53ec83ca-0693-46f3-a55b-110c3f8f5a64/privacy-notices/bd09463e-b148-44d4-91e5-3ee9328b729a/draft/privacynotice.json";
 
-  // ==========================================
-  // CREATE POPUP HTML
-  // ==========================================
+  const allowedLanguages =
+    COUNTRY_LANGUAGES[countryCode] ||
+    COUNTRY_LANGUAGES.US;
 
-  const optionsHTML = languages.map(function (language) {
-    return `<option value="${language.code}">${language.label}</option>`;
-  }).join("");
+
+  // ==========================================
+  // 3. CREATE POPUP
+  // ==========================================
 
   const popupHTML = `<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>Privacy Notice</title>
 
   <style>
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -116,35 +133,22 @@ function openPrivacyNotice() {
       color: #222222;
     }
 
-    .privacy-language-selector {
-      margin-bottom: 25px;
+    h2 {
+      margin-top: 0;
     }
 
-    .privacy-language-selector label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+    /* Keep the native OneTrust dropdown.
+       Do not create another custom selector. */
 
-    #country-language-selector {
-      width: 260px;
-      max-width: 100%;
-      padding: 11px;
-      border: 1px solid #999999;
-      border-radius: 4px;
-      background: #ffffff;
-      font-size: 14px;
+    .ot-privacy-notice-language-dropdown-container {
+      display: block !important;
+      visibility: visible !important;
     }
 
     .otnotice {
       margin-top: 20px;
     }
 
-    #notice-error {
-      color: #b00020;
-      margin-top: 15px;
-    }
   </style>
 
 </head>
@@ -153,24 +157,18 @@ function openPrivacyNotice() {
 
   <h2>Privacy Notice</h2>
 
-  <div class="privacy-language-selector">
+  <!-- NATIVE ONETRUST LANGUAGE DROPDOWN -->
 
-    <label for="country-language-selector">
-      Select Language:
-    </label>
+  <div class="ot-privacy-notice-language-dropdown-container"></div>
 
-    <select id="country-language-selector">
-      ${optionsHTML}
-    </select>
-
-  </div>
+  <!-- ONETRUST NOTICE -->
 
   <div
     id="otnotice-bd09463e-b148-44d4-91e5-3ee9328b729a"
     class="otnotice">
   </div>
 
-  <p id="notice-error"></p>
+  <!-- ONETRUST SDK -->
 
   <script
     src="https://privacyportal-in-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js"
@@ -184,78 +182,152 @@ function openPrivacyNotice() {
 
   <script>
 
-    (function () {
+  (function () {
 
-      const selector = document.getElementById(
-        "country-language-selector"
-      );
+    const allowed = ${JSON.stringify(allowedLanguages)}.map(
+      value => String(value).trim().toLowerCase()
+    );
 
-      const noticeContainer = document.getElementById(
-        "otnotice-bd09463e-b148-44d4-91e5-3ee9328b729a"
-      );
+    const container = document.querySelector(
+      ".ot-privacy-notice-language-dropdown-container"
+    );
 
-      const errorElement = document.getElementById("notice-error");
+    let filtering = false;
 
-      function loadNotice(languageCode) {
+    function normalize(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\\s+/g, " ");
+    }
 
-        noticeContainer.setAttribute(
-          "dir",
-          languageCode.startsWith("ar") ? "rtl" : "ltr"
-        );
+    function filterOneTrustDropdown() {
 
-        errorElement.textContent = "";
+      if (filtering) return;
 
-        try {
+      const dropdowns = container.querySelectorAll("select");
 
-          OneTrust.NoticeApi.LoadNotices(
-            [${JSON.stringify(noticeURL)}],
-            true,
-            languageCode
+      if (!dropdowns.length) return;
+
+      filtering = true;
+
+      dropdowns.forEach(function (dropdown) {
+
+        const options = Array.from(dropdown.options);
+
+        const matchedOptions = options.filter(function (option) {
+
+          const value = normalize(option.value);
+          const label = normalize(option.textContent);
+
+          return allowed.includes(value) ||
+                 allowed.includes(label);
+
+        });
+
+        // Never empty the native dropdown if the
+        // actual OneTrust option identifiers differ.
+        if (matchedOptions.length === 0) {
+
+          console.warn(
+            "No matching OneTrust languages found.",
+            options.map(option => ({
+              text: option.textContent,
+              value: option.value
+            }))
           );
 
-        } catch (error) {
-
-          console.error("OneTrust notice loading error:", error);
-
-          errorElement.textContent =
-            "Unable to load the Privacy Notice. Check the browser console.";
+          return;
 
         }
 
-      }
+        options.forEach(function (option) {
 
-      if (
-        typeof OneTrust === "undefined" ||
-        !OneTrust.NoticeApi
-      ) {
+          const value = normalize(option.value);
+          const label = normalize(option.textContent);
 
-        errorElement.textContent =
-          "OneTrust SDK failed to load. Check the browser console.";
+          const isAllowed =
+            allowed.includes(value) ||
+            allowed.includes(label);
 
-        return;
+          option.hidden = !isAllowed;
+          option.disabled = !isAllowed;
 
-      }
+        });
+
+        // If the currently selected option is not allowed,
+        // select the first available allowed language.
+        const currentValue = normalize(dropdown.value);
+
+        const currentAllowed = matchedOptions.some(function (option) {
+          return normalize(option.value) === currentValue;
+        });
+
+        if (!currentAllowed) {
+
+          dropdown.value = matchedOptions[0].value;
+
+          dropdown.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+
+        }
+
+        console.log(
+          "OneTrust language options filtered for:",
+          countryCode,
+          matchedOptions.map(option => option.textContent)
+        );
+
+      });
+
+      filtering = false;
+
+    }
+
+
+    // Watch OneTrust's native dropdown container.
+    // OneTrust may render its dropdown asynchronously.
+
+    const observer = new MutationObserver(function () {
+
+      filtering = false;
+      filterOneTrustDropdown();
+
+    });
+
+    observer.observe(container, {
+      childList: true,
+      subtree: true
+    });
+
+
+    // Initial attempt after OneTrust initialization.
+
+    if (
+      typeof OneTrust !== "undefined" &&
+      OneTrust.NoticeApi
+    ) {
 
       OneTrust.NoticeApi.Initialized.then(function () {
 
-        loadNotice(selector.value);
+        OneTrust.NoticeApi.LoadNotices([${JSON.stringify(noticeURL)}]);
+
+        filterOneTrustDropdown();
 
       }).catch(function (error) {
 
-        console.error("OneTrust initialization failed:", error);
-
-        errorElement.textContent =
-          "OneTrust initialization failed.";
+        console.error("OneTrust initialization error:", error);
 
       });
 
-      selector.addEventListener("change", function () {
+    } else {
 
-        loadNotice(this.value);
+      console.error("OneTrust SDK is not available.");
 
-      });
+    }
 
-    })();
+  })();
 
   </script>
 
