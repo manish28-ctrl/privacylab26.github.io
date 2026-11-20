@@ -28,29 +28,33 @@ function openPrivacyNotice() {
         <body>
           
 
-<!-- OneTrust Privacy Notice start -->
 
-<!-- Custom country-specific language selector -->
+<!-- ==========================================
+     ONETRUST PRIVACY NOTICE
+     Country-based language selector
+========================================== -->
+
 <div class="privacy-language-selector">
-  <label for="country-language-selector">
-    Select Language:
-  </label>
-
+  <label for="country-language-selector">Select Language:</label>
   <select id="country-language-selector"></select>
 </div>
 
-<!-- OneTrust Privacy Notice container -->
 <div
   id="otnotice-bd09463e-b148-44d4-91e5-3ee9328b729a"
   class="otnotice">
 </div>
 
-<!-- Country code injected by Node.js backend -->
+<!--
+  IMPORTANT:
+  Your backend must replace __COUNTRY_CODE__
+  with the visitor's ISO country code, such as IN, AE, QA.
+  Do not leave this placeholder unchanged in production.
+-->
 <script>
   window.NOTICE_COUNTRY_CODE = "__COUNTRY_CODE__";
 </script>
 
-<!-- Original OneTrust SDK -->
+<!-- OneTrust Privacy Notice SDK -->
 <script
   src="https://privacyportal-in-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js"
   type="text/javascript"
@@ -61,114 +65,103 @@ function openPrivacyNotice() {
 
 </script>
 
-<!-- Country-based language selection -->
 <script type="text/javascript" charset="UTF-8">
 
 (function () {
 
-  const noticeURL =
-    "https://privacyportal-in-cdn.onetrust.com/storage-container/53ec83ca-0693-46f3-a55b-110c3f8f5a64/privacy-notices/bd09463e-b148-44d4-91e5-3ee9328b729a/draft/privacynotice.json";
+  // ==========================================
+  // 1. COUNTRY-LANGUAGE CONFIGURATION
+  // ==========================================
 
-  // ==================================
-  // COUNTRY LANGUAGE CONFIGURATION
-  // Edit this section as required
-  // ==================================
+  const COUNTRY_LANGUAGES = {
 
-  const COUNTRY_LANGUAGE_CONFIG = {
+    // United Arab Emirates
+    AE: [
+      { code: "ar-ae", label: "UAE Arabic" },
+      { code: "en", label: "English" }
+    ],
 
-    FR: {
-      default: "fr",
-      languages: [
-        { code: "fr", label: "Français" },
-        { code: "en", label: "English" }
-      ]
-    },
+    // Qatar
+    QA: [
+      { code: "ar-qa", label: "Qatar Arabic" },
+      { code: "en", label: "English" }
+    ],
 
-    IN: {
-      default: "en",
-      languages: [
-        { code: "en", label: "English" },
-        { code: "hi", label: "हिन्दी" },
-        { code: "bn", label: "বাংলা" },
-        { code: "te", label: "తెలుగు" },
-        { code: "mr", label: "मराठी" },
-        { code: "ta", label: "தமிழ்" },
-        { code: "ur", label: "اردو" },
-        { code: "gu", label: "ગુજરાતી" },
-        { code: "kn", label: "ಕನ್ನಡ" },
-        { code: "or", label: "ଓଡ଼ିଆ" },
-        { code: "ml", label: "മലയാളം" }
-      ]
-    },
+    // India
+    IN: [
+      { code: "gu", label: "Gujarati" },
+      { code: "mr", label: "Marathi" },
+      { code: "te", label: "Telugu" },
+      { code: "ta", label: "Tamil" },
+      { code: "bn", label: "Bengali" },
+      { code: "kn", label: "Kannada" },
+      { code: "ml", label: "Malayalam" },
+      { code: "as", label: "Assamese" },
+      { code: "pa", label: "Punjabi" },
+      { code: "or", label: "Oriya" },
+      { code: "hi", label: "Hindi" },
+      { code: "en", label: "English" }
+    ],
 
-    AE: {
-      default: "ar-ae",
-      languages: [
-        { code: "ar-ae", label: "العربية (الإمارات)" },
-        { code: "ar-qa", label: "العربية (قطر)" },
-        { code: "en", label: "English" }
-      ]
-    },
+    // Vietnam
+    VN: [
+      { code: "vi", label: "Vietnamese" },
+      { code: "en", label: "English" }
+    ],
 
-    QA: {
-      default: "ar-qa",
-      languages: [
-        { code: "ar-qa", label: "العربية (قطر)" },
-        { code: "ar-ae", label: "العربية (الإمارات)" },
-        { code: "en", label: "English" }
-      ]
-    },
+    // Malaysia
+    MY: [
+      { code: "ms", label: "Malay" },
+      { code: "en", label: "English" }
+    ],
 
-    US: {
-      default: "en",
-      languages: [
-        { code: "en", label: "English" }
-      ]
-    },
-
-    MY: {
-      default: "ms",
-      languages: [
-        { code: "ms", label: "Bahasa Melayu" },
-        { code: "en", label: "English" }
-      ]
-    },
-
-    VN: {
-      default: "vi",
-      languages: [
-        { code: "vi", label: "Tiếng Việt" },
-        { code: "en", label: "English" }
-      ]
-    }
+    // United States
+    US: [
+      { code: "en", label: "English" }
+    ]
 
   };
 
-  // ==================================
-  // DETECT COUNTRY FROM NODE.JS
-  // ==================================
 
-  const countryCode =
-    (window.NOTICE_COUNTRY_CODE || "").toUpperCase();
+  // ==========================================
+  // 2. DEFAULT LANGUAGE CONFIGURATION
+  // ==========================================
 
-  // Fallback configuration
-  const countryConfig =
-    COUNTRY_LANGUAGE_CONFIG[countryCode] || {
-      default: "en",
-      languages: [
-        { code: "en", label: "English" }
-      ]
-    };
+  const DEFAULT_LANGUAGE = {
+    code: "en",
+    label: "English"
+  };
 
-  // ==================================
-  // CREATE LANGUAGE DROPDOWN
-  // ==================================
+  const countryCode = (
+    window.NOTICE_COUNTRY_CODE || ""
+  ).trim().toUpperCase();
+
+  const availableLanguages =
+    COUNTRY_LANGUAGES[countryCode] ||
+    [DEFAULT_LANGUAGE];
+
+
+  // ==========================================
+  // 3. ONE TRUST NOTICE CONFIGURATION
+  // ==========================================
+
+  const noticeURL =
+    "https://privacyportal-in-cdn.onetrust.com/storage-container/53ec83ca-0693-46f3-a55b-110c3f8f5a64/privacy-notices/bd09463e-b148-44d4-91e5-3ee9328b729a/draft/privacynotice.json";
 
   const selector = document.getElementById(
     "country-language-selector"
   );
 
-  countryConfig.languages.forEach(function (language) {
+  const noticeContainer = document.getElementById(
+    "otnotice-bd09463e-b148-44d4-91e5-3ee9328b729a"
+  );
+
+
+  // ==========================================
+  // 4. POPULATE LANGUAGE DROPDOWN
+  // ==========================================
+
+  availableLanguages.forEach(function (language) {
 
     const option = document.createElement("option");
 
@@ -179,43 +172,53 @@ function openPrivacyNotice() {
 
   });
 
-  selector.value = countryConfig.default;
 
-  // ==================================
-  // LOAD ONETRUST PRIVACY NOTICE
-  // ==================================
+  // ==========================================
+  // 5. SELECT DEFAULT LANGUAGE
+  // ==========================================
+
+  selector.value = availableLanguages[0].code;
+
+
+  // ==========================================
+  // 6. LOAD ONETRUST PRIVACY NOTICE
+  // ==========================================
+
+  function loadPrivacyNotice(languageCode) {
+
+    if (languageCode.startsWith("ar")) {
+      noticeContainer.setAttribute("dir", "rtl");
+    } else {
+      noticeContainer.setAttribute("dir", "ltr");
+    }
+
+    OneTrust.NoticeApi.LoadNotices(
+      [noticeURL],
+      true,
+      languageCode
+    );
+
+  }
+
+
+  // ==========================================
+  // 7. INITIALIZE ONETRUST
+  // ==========================================
 
   OneTrust.NoticeApi.Initialized.then(function () {
 
-    function loadNotice(languageCode) {
+    loadPrivacyNotice(selector.value);
 
-      OneTrust.NoticeApi.LoadNotices(
-        [noticeURL],
-        true,
-        languageCode
-      );
+  });
 
-      document.documentElement.lang = languageCode;
 
-      document.documentElement.dir =
-        languageCode.startsWith("ar") ? "rtl" : "ltr";
+  // ==========================================
+  // 8. HANDLE LANGUAGE CHANGE
+  // ==========================================
 
-      console.log(
-        "Country:", countryCode,
-        "| Language:", languageCode
-      );
+  selector.addEventListener("change", function () {
 
-    }
-
-    // Initial language
-    loadNotice(countryConfig.default);
-
-    // Manual language switching
-    selector.addEventListener("change", function () {
-
-      loadNotice(this.value);
-
-    });
+    loadPrivacyNotice(this.value);
 
   });
 
@@ -223,7 +226,10 @@ function openPrivacyNotice() {
 
 </script>
 
-<!-- OneTrust Privacy Notice end -->
+<!-- ==========================================
+     END ONETRUST PRIVACY NOTICE
+========================================== -->
+
 
         </body>
         </html>
